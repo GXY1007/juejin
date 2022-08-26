@@ -1,28 +1,37 @@
 const { defineConfig } = require('@vue/cli-service')
+const { VantResolver } = require('unplugin-vue-components/resolvers');
+const ComponentsPlugin = require('unplugin-vue-components/webpack');
 
-const AutoImport = require('unplugin-auto-import/webpack')
-const Components = require('unplugin-vue-components/webpack')
-const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
+
+const path = require('path')
 
 module.exports = defineConfig({
     transpileDependencies: true,
     lintOnSave: false,
     configureWebpack: {
         plugins: [
-            AutoImport({
-                resolvers: [ElementPlusResolver()]
+            ComponentsPlugin({
+                resolvers: [VantResolver()],
             }),
-            Components({
-                resolvers: [ElementPlusResolver()]
-            })
-        ]
-    },
-    pluginOptions: {
-        'style-resources-loader': {
-            preProcessor: 'less',
-            patterns: [
-                path.resolve(__dirname, './src/assets/style.less')
+        ],
+        module: {
+            rules: [
+                // 配置读取 *.md 文件的规则
+                {
+                    test: /\.md$/,
+                    use: [
+                        { loader: "html-loader" },
+                        { loader: "markdown-loader", options: {} }
+                    ]
+                }
             ]
         }
+    },
+    pluginOptions: {
+      'style-resources-loader': {
+        preProcessor: 'less',
+        patterns: [path.resolve(__dirname, 'src/assets/style.less')]
+      }
     }
 })
+
